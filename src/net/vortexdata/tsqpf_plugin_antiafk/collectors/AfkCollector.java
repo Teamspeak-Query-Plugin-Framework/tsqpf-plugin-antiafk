@@ -30,9 +30,9 @@ public class AfkCollector implements Runnable {
         }
 
         try {
-            this.maxIdleTime = Integer.parseInt(config.readValue("maxIdleTimeInSeconds"));
+            this.maxIdleTime = Integer.parseInt(config.readValue("maxIdleTimeInSeconds")) * 1000;
         } catch (NumberFormatException e) {
-            this.maxIdleTime = 900;
+            this.maxIdleTime = 900 * 1000;
             logger.printError("Failed to parse config value for key 'maxIdleTimeInSeconds', therefor falling back to default value of 900. Please check you config and reload the plugin.");
         }
 

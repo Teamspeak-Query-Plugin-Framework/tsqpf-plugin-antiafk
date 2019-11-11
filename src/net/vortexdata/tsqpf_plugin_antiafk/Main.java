@@ -5,6 +5,8 @@ import net.vortexdata.tsqpf_plugin_antiafk.collectors.*;
 
 public class Main extends TeamspeakPlugin {
 
+    private Thread collectorProzess;
+
     @Override
     public void onEnable() {
         getConfig().setDefault("maxIdleTimeInSeconds", "900");
@@ -15,7 +17,8 @@ public class Main extends TeamspeakPlugin {
         getConfig().setDefault("privateChannelStaticString", "Private Channel");
         getConfig().saveAll();
 
-        new Thread(new AfkCollector(getConfig(), getLogger(), getAPI())).start();
+        collectorProzess = new Thread(new AfkCollector(getConfig(), getLogger(), getAPI()));
+        collectorProzess.start();
     }
 
     @Override

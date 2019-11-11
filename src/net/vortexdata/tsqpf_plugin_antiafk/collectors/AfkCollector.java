@@ -66,7 +66,7 @@ public class AfkCollector implements Runnable {
             for (Client client : clients) {
                 if (client.getId() != api.whoAmI().getId() && client.getChannelId() != afkChannelId && client.getIdleTime() > maxIdleTime) {
 
-                    if (Boolean.parseBoolean(config.readValue("usePrivateChannelClause"))) {
+                    if (usePrivateChannelClause) {
                         if (!api.getChannelInfo(client.getChannelId()).getName().contains(config.readValue("privateChannelStaticString"))) {
                             api.moveClient(client.getId(), afkChannelId);
                             api.sendPrivateMessage(client.getId(), config.readValue("messageClientMoved"));

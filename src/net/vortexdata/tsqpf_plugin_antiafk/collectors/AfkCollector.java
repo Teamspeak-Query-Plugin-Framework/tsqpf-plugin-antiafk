@@ -59,21 +59,25 @@ public class AfkCollector implements Runnable {
             try {
                 Thread.sleep(sleep);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.printWarn("Encountered an interrupted exception while sleeping.");
             }
 
             List<Client> clients = api.getClients();
             for (Client client : clients) {
                 if (client.getId() != api.whoAmI().getId() && client.getChannelId() != afkChannelId && client.getIdleTime() > maxIdleTime) {
 
-                    if (usePrivateChannelClause) {
-                        if (!api.getChannelInfo(client.getChannelId()).getName().contains(config.readValue("privateChannelStaticString"))) {
+                    try {
+                        if (usePrivateChannelClause) {
+                            if (!api.getChannelInfo(client.getChannelId()).getName().contains(config.readValue("privateChannelStaticString"))) {
+                                api.moveClient(client.getId(), afkChannelId);
+                                api.sendPrivateMessage(client.getId(), config.readValue("messageClientMoved"));
+                            }
+                        } else {
                             api.moveClient(client.getId(), afkChannelId);
                             api.sendPrivateMessage(client.getId(), config.readValue("messageClientMoved"));
                         }
-                    } else {
-                        api.moveClient(client.getId(), afkChannelId);
-                        api.sendPrivateMessage(client.getId(), config.readValue("messageClientMoved"));
+                    } catch (Exception e) {
+                        logger.printWarn("Failed to move client " + client.getNickname() + " to AFK channel, dumping error info: " + e.getMessage());
                     }
 
                 }

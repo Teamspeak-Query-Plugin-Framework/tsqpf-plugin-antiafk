@@ -16,6 +16,8 @@ public class AfkCollector implements Runnable {
     private int afkChannelId;
     private int maxIdleTime;
     private boolean usePrivateChannelClause;
+    private boolean useWhitelistedGroupsClause;
+    private ArrayList<Integer> whitelistedGroups;
 
     public AfkCollector(PluginConfig config, PluginLogger logger, TS3Api api) {
         this.config = config;
@@ -28,6 +30,37 @@ public class AfkCollector implements Runnable {
             this.usePrivateChannelClause = true;
             logger.printError("Failed to parse config value for key 'usePrivateChannelClause', therefor falling back to default value of true. Please check you config and reload the plugin.");
         }
+
+        try {
+            this.useWhitelistedGroupsClause = Boolean.parseBoolean(config.readValue("useGroupWhitelistClause"));
+
+            if (useWhitelistedGroupsClause) {
+
+                whitelistedGroups = new ArrayList<>();
+
+                try {
+                    Arrays.stream(config.readValue("whitelistedGroups").split(",")).forEach(x -> {
+                        whitelistedGroups.add(Integer.parseInt(x));
+                    });
+
+                    if (whitelistedGroups.size() < 1) {
+                        logger.printWarn("No values in 'whitelistedGroups', setting clause 'useGroupWhitelistClause' to false.");
+                        useWhitelistedGroupsClause = false;
+                    }
+
+                } catch (Exception e) {
+                    logger.printError("Failed to parse config value for key 'whitelistedGroups', disabling clause for 'useGroupWhitelistClause'.");
+                    useWhitelistedGroupsClause = false;
+                }
+
+
+            }
+
+        } catch (Exception e) {
+            this.useWhitelistedGroupsClause = false;
+            logger.printError("Failed to parse config value for key 'useGroupWhitelistClause', therefor falling back to default value of false. Please check you config and reload the plugin.");
+        }
+
 
         try {
             this.maxIdleTime = Integer.parseInt(config.readValue("maxIdleTimeInSeconds")) * 1000;
@@ -54,41 +87,63 @@ public class AfkCollector implements Runnable {
     @Override
     public void run() {
 
-        while (true) {
+        try {
 
-            try {
-                Thread.sleep(sleep);
-            } catch (InterruptedException e) {
-                logger.printWarn("Encountered an interrupted exception while sleeping.");
-            }
+            while (true) {
 
-            List<Client> clients = api.getClients();
-            for (Client client : clients) {
                 try {
-                    if (client.getId() != api.whoAmI().getId() && client.getChannelId() != afkChannelId && client.getIdleTime() > maxIdleTime) {
-
-                        try {
-                            if (usePrivateChannelClause) {
-                                if (!api.getChannelInfo(client.getChannelId()).getName().contains(config.readValue("privateChannelStaticString"))) {
-                                    api.moveClient(client.getId(), afkChannelId);
-                                    api.sendPrivateMessage(client.getId(), config.readValue("messageClientMoved"));
-                                }
-                            } else {
-                                api.moveClient(client.getId(), afkChannelId);
-                                api.sendPrivateMessage(client.getId(), config.readValue("messageClientMoved"));
-                            }
-                        } catch (Exception e) {
-                            logger.printWarn("Failed to move client " + client.getNickname() + " to AFK channel, dumping error info: " + e.getMessage());
-                        }
-
-                    }
-                } catch (Exception e) {
-                    logger.printWarn("Failed to fetch client details, dumping error info: " + e.getMessage());
+                    Thread.sleep(sleep);
+                } catch (InterruptedException e) {
+                    logger.printWarn("Encountered an interrupted exception while sleeping.");
                 }
+
+                List<Client> clients = api.getClients();
+                for (Client client : clients) {
+                    moveClient(client);
+                }
+
             }
 
+        } catch (Exception e) {
+            logger.printDebug("AFK collector service encountered an exception, stopping...");
         }
 
+    }
+
+    public void moveClient(Client client) {
+        try {
+            if (client.getId() != api.whoAmI().getId() && client.getChannelId() != afkChannelId && client.getIdleTime() > maxIdleTime) {
+
+                // Test if client is whitelisted and return if that is the case
+                if (useWhitelistedGroupsClause) {
+                    for (int c : client.getServerGroups()) {
+                        if (whitelistedGroups.contains(c)) {
+                            return;
+                        }
+                    }
+                }
+
+                try {
+                    if (usePrivateChannelClause) {
+                        if (!api.getChannelInfo(client.getChannelId()).getName().contains(config.readValue("privateChannelStaticString"))) {
+                            api.moveClient(client.getId(), afkChannelId);
+                            api.sendPrivateMessage(client.getId(), config.readValue("messageClientMoved"));
+                        }
+                    }
+
+
+                    else {
+                        api.moveClient(client.getId(), afkChannelId);
+                        api.sendPrivateMessage(client.getId(), config.readValue("messageClientMoved"));
+                    }
+                } catch (Exception e) {
+                    logger.printWarn("Failed to move client " + client.getNickname() + " to AFK channel, dumping error info: " + e.getMessage());
+                }
+
+            }
+        } catch (Exception e) {
+            logger.printWarn("Failed to fetch client details, dumping error info: " + e.getMessage());
+        }
     }
 
 }

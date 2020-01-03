@@ -1,9 +1,10 @@
 package net.vortexdata.tsqpf_plugin_antiafk;
 
+import com.github.theholywaffle.teamspeak3.api.event.*;
 import net.vortexdata.tsqpf.plugins.*;
 import net.vortexdata.tsqpf_plugin_antiafk.collectors.*;
 
-public class Main extends TeamspeakPlugin {
+public class AntiAFK extends TeamspeakPlugin {
 
     private Thread collectorProzess;
 
@@ -15,6 +16,8 @@ public class Main extends TeamspeakPlugin {
         getConfig().setDefault("messageClientMoved", "I've moved you to the AFK channel to make room for other users, as you idled for more than 15 minutes.");
         getConfig().setDefault("usePrivateChannelClause", "true");
         getConfig().setDefault("privateChannelStaticString", "Private Channel");
+        getConfig().setDefault("useGroupWhitelistClause", "false");
+        getConfig().setDefault("whitelistedGroups", "1");
         getConfig().saveAll();
 
         collectorProzess = new Thread(new AfkCollector(getConfig(), getLogger(), getAPI()));
@@ -23,7 +26,6 @@ public class Main extends TeamspeakPlugin {
 
     @Override
     public void onDisable() {
-
+        collectorProzess.interrupt();
     }
-
 }

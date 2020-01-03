@@ -1,3 +1,3 @@
-main: net.vortexdata.tsqpf_plugin_antiafk.Main
+main: net.vortexdata.tsqpf_plugin_antiafk.AntiAFK
 name: AntiAFK
 version: 1.0.0-SNAPSHOT

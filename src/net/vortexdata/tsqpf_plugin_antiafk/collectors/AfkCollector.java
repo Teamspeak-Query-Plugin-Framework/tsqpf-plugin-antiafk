@@ -24,6 +24,9 @@ public class AfkCollector implements Runnable {
         this.logger = logger;
         this.api = api;
 
+        logger.printDebug("AFKCollector service initializing...");
+        System.out.println("Hi");
+
         try {
             this.usePrivateChannelClause = Boolean.parseBoolean(config.readValue("usePrivateChannelClause"));
         } catch (Exception e) {

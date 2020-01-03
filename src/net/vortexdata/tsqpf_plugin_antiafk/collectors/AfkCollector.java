@@ -95,7 +95,8 @@ public class AfkCollector implements Runnable {
                 try {
                     Thread.sleep(sleep);
                 } catch (InterruptedException e) {
-                    logger.printWarn("Encountered an interrupted exception while sleeping.");
+                    logger.printWarn("Encountered an interrupted exception while sleeping, shutting down collection service...");
+                    return;
                 }
 
                 List<Client> clients = api.getClients();

@@ -91,6 +91,7 @@ public class AfkCollector implements Runnable {
 
             while (true) {
 
+                logger.printDebug("Collecting clients...");
                 try {
                     Thread.sleep(sleep);
                 } catch (InterruptedException e) {
@@ -98,9 +99,12 @@ public class AfkCollector implements Runnable {
                 }
 
                 List<Client> clients = api.getClients();
+                logger.printDebug("Trying to move and evaluate clients...");
                 for (Client client : clients) {
                     moveClient(client);
                 }
+
+                logger.printDebug("Collection finished.");
 
             }
 
@@ -118,6 +122,7 @@ public class AfkCollector implements Runnable {
                 if (useWhitelistedGroupsClause) {
                     for (int c : client.getServerGroups()) {
                         if (whitelistedGroups.contains(c)) {
+                            logger.printDebug("Cancelled collection of client "+client.getDatabaseId()+", as they are member of whitelisted group.");
                             return;
                         }
                     }
@@ -128,11 +133,10 @@ public class AfkCollector implements Runnable {
                         if (!api.getChannelInfo(client.getChannelId()).getName().contains(config.readValue("privateChannelStaticString"))) {
                             api.moveClient(client.getId(), afkChannelId);
                             api.sendPrivateMessage(client.getId(), config.readValue("messageClientMoved"));
+                        } else {
+                            logger.printDebug("Cancelled collection of client "+client.getDatabaseId()+", as they are member of private channel.");
                         }
-                    }
-
-
-                    else {
+                    } else {
                         api.moveClient(client.getId(), afkChannelId);
                         api.sendPrivateMessage(client.getId(), config.readValue("messageClientMoved"));
                     }

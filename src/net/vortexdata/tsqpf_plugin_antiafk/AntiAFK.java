@@ -11,7 +11,7 @@ public class AntiAFK extends TeamspeakPlugin {
     @Override
     public void onEnable() {
         getConfig().setDefault("maxIdleTimeInSeconds", "900");
-        getConfig().setDefault("afkClientCollectionIntervalInSeconds", "10");
+        getConfig().setDefault("afkClientCollectionIntervalInSeconds", "60");
         getConfig().setDefault("afkChannelId", "1");
         getConfig().setDefault("messageClientMoved", "I've moved you to the AFK channel to make room for other users, as you idled for more than 15 minutes.");
         getConfig().setDefault("usePrivateChannelClause", "true");

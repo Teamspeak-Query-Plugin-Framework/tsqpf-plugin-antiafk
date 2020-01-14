@@ -1,7 +1,8 @@
 package net.vortexdata.tsqpf_plugin_antiafk;
 
+import com.github.theholywaffle.teamspeak3.api.event.*;
 import net.vortexdata.tsqpf.plugins.*;
-import net.vortexdata.tsqpf_plugin_antiafk.collectors.AfkCollector;
+import net.vortexdata.tsqpf_plugin_antiafk.collectors.*;
 
 public class AntiAFK extends TeamspeakPlugin {
 

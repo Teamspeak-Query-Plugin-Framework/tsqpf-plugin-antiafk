@@ -1,4 +1,4 @@
-package net.vortexdata.tsqpf_plugin_antiafk.AntiAFK.collectors;
+package net.vortexdata.tsqpf_plugin_antiafk.collectors;
 
 import com.github.theholywaffle.teamspeak3.*;
 import com.github.theholywaffle.teamspeak3.api.wrapper.*;

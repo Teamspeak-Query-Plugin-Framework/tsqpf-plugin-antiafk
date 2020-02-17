@@ -18,7 +18,7 @@ KEY | DATATYPE | DESCRIPTION
 - **maxIdleTimeInSeconds** : [Integer] How long a client can remain AFK in a channel before being moved.
 - **privateChannelStaticString** : [String] A string which is present in all private channel names.
 - **afkClientCollectionIntervalInSeconds** : [Integer] Interval of how often the afkClientCollector will check for AFK clients.
-- **afkChannelId** : [Integer] Channel id of the AFK channel clients get move to.
+- **afkChannelId** : [Integer] Channel id of the AFK channel clients get moved to.
 - **usePrivateChannelClause** : [Boolean] Tells the plugin if it should exclude private channel from AFK check.
 - **messageClientMoved** : [String] Tells the AFK client why he has been moved to the AFK channel.
 
